@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0d1b14" />
+  <title>Escape from Zombie School</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=Heebo:wght@500;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <div class="topbar" id="topbar" hidden>
+      <button class="icon-btn" id="pauseBtn" type="button" aria-label="Pause">❚❚</button>
+      <header class="hud" id="hud">
+        <div class="hud-item">
+          <span class="hud-label" data-i18n="hud_level">Level</span>
+          <span id="levelNum">1</span>
+        </div>
+        <div class="hud-item hearts" id="lives">❤️❤️❤️</div>
+        <div class="hud-item">
+          <span class="hud-label" data-i18n="hud_coins">Coins</span>
+          <span id="coinStatus">🪙 0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label" data-i18n="hud_key">Key</span>
+          <span id="keyStatus">🔒</span>
+        </div>
+        <div class="hud-item" id="modeHud" hidden>
+          <span id="modeStatus">Co-op</span>
+        </div>
+        <div class="hud-item" id="bookHud" hidden>
+          <span class="hud-label" data-i18n="hud_book">Book</span>
+          <span id="bookStatus">📖</span>
+        </div>
+      </header>
+    </div>
+
+    <div class="playfield" id="playfield">
+      <canvas id="game" width="390" height="680"></canvas>
+
+    <div class="controls" id="controls" hidden>
+      <div class="player-pad pad-p1" id="padP1">
+        <button class="throw-btn" id="throwBtn1" type="button" aria-label="Throw P1">
+          <span class="throw-icon">📖</span>
+          <span class="throw-ring" id="throwRing1"></span>
+        </button>
+        <div class="joystick-base" id="joy1">
+          <div class="joystick-knob" id="knob1"></div>
+          <span class="pad-label" id="padLabel1">P1</span>
+        </div>
+      </div>
+      <div class="player-pad pad-p2" id="padP2" hidden>
+        <button class="throw-btn" id="throwBtn2" type="button" aria-label="Throw P2">
+          <span class="throw-icon">📖</span>
+          <span class="throw-ring" id="throwRing2"></span>
+        </button>
+        <div class="joystick-base" id="joy2">
+          <div class="joystick-knob" id="knob2"></div>
+          <span class="pad-label" id="padLabel2">P2</span>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <section class="screen menu-screen" id="menuScreen">
+      <div class="screen-bg"></div>
+      <div class="menu-scroll">
+        <div class="menu-sticky-bar">
+          <div class="menu-identity">
+            <canvas id="menuAvatarPreview" class="menu-avatar" width="44" height="52" aria-hidden="true"></canvas>
+            <p class="menu-name-line" id="menuNameLine">Name: —</p>
+          </div>
+          <button class="btn settings btn-compact" id="settingsBtn" type="button" data-i18n="settings">⚙️ Settings</button>
+        </div>
+        <div class="brand">
+          <p class="eyebrow" data-i18n="brand">Eliya Game</p>
+          <h1><span data-i18n="title_line1">Escape from</span><br /><span data-i18n="title_line2">Zombie School</span></h1>
+          <p class="tagline" data-i18n="tagline">The teachers turned into zombies. Escape the building before they catch you!</p>
+        </div>
+        <div class="menu-actions">
+          <button class="btn primary" id="continueBtn" type="button" hidden data-i18n="continue_game">Continue</button>
+          <p class="continue-hint" id="continueHint" hidden></p>
+          <button class="btn primary" id="onePlayerBtn" data-i18n="one_player">One player</button>
+          <button class="btn ghost" id="newGameBtn" type="button" hidden data-i18n="new_game">New game (from start)</button>
+          <button class="btn coop" id="twoPlayersBtn" data-i18n="two_players">Two players (same screen)</button>
+          <button class="btn online" id="onlineBtn" data-i18n="online">Online — invite a friend</button>
+          <button class="btn coins" id="leaderboardBtn" type="button" data-i18n="leaderboard">🏆 Coin leaderboard</button>
+          <p class="menu-coins" id="menuCoins">🪙 Your coins: 0</p>
+          <button class="btn ghost" id="muteBtn" type="button" data-i18n="mute_on">🔊 Sound on</button>
+          <button class="btn ghost" id="howtoBtn" data-i18n="howto">How to play?</button>
+          <button class="btn creator hidden" id="creatorBtn" data-i18n="creator" hidden>Creator mode ∞</button>
+          <p class="levels-hint" data-i18n="levels_hint">10 levels + final boss · play at :8787</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="settingsScreen">
+      <div class="panel">
+        <p class="eyebrow" data-i18n="settings_eyebrow">Settings</p>
+        <h2 data-i18n="language">Language</h2>
+        <div class="lang-row" id="langRow">
+          <button type="button" class="lang-btn" data-lang="he">Hebrew</button>
+          <button type="button" class="lang-btn" data-lang="en">English</button>
+          <button type="button" class="lang-btn" data-lang="fr">Français</button>
+          <button type="button" class="lang-btn" data-lang="ja">日本語</button>
+        </div>
+        <h2 data-i18n="settings_title">Your name</h2>
+        <p class="creator-hint" data-i18n="settings_hint">Change your name anytime. Letters + exactly 3 digits required.</p>
+        <div class="name-row">
+          <label class="name-label" for="nameInputP1" data-i18n="new_name">New name</label>
+          <input class="name-input" id="nameInputP1" type="text" maxlength="15" placeholder="e.g. Eliya123" data-i18n-placeholder="name_ph" autocomplete="off" enterkeyhint="done" inputmode="text" required />
+          <p class="name-hint" id="nameHintP1" data-i18n="name_hint">Name must include 3 digits</p>
+        </div>
+        <button class="btn primary" id="settingsSaveBtn" type="button" data-i18n="save_name">Save name</button>
+
+        <h2 data-i18n="avatar_title">Your avatar</h2>
+        <p class="creator-hint" data-i18n="avatar_hint">Pick skin, shirt and hair — live preview</p>
+        <div class="avatar-studio">
+          <canvas id="avatarPreview" class="avatar-preview" width="120" height="140" aria-label="Avatar preview"></canvas>
+          <div class="avatar-options">
+            <p class="avatar-label" data-i18n="avatar_skin">Skin</p>
+            <div class="swatch-row" id="avatarSkinRow"></div>
+            <p class="avatar-label" data-i18n="avatar_shirt">Shirt</p>
+            <div class="swatch-row" id="avatarBodyRow"></div>
+            <p class="avatar-label" data-i18n="avatar_hair">Hair</p>
+            <div class="hair-row" id="avatarHairRow"></div>
+            <p class="avatar-label" data-i18n="avatar_hair_color">Hair color</p>
+            <div class="swatch-row" id="avatarHairColorRow"></div>
+          </div>
+        </div>
+        <button class="btn ghost" id="avatarSaveBtn" type="button" data-i18n="avatar_save">Save avatar</button>
+
+        <button class="btn ghost" id="settingsMuteBtn" type="button" data-i18n="mute_on">🔊 Sound on</button>
+        <button class="btn ghost" id="settingsBack" data-i18n="back">Back</button>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="onlineScreen">
+      <div class="panel online-panel">
+        <p class="eyebrow" data-i18n="online_eyebrow">Online</p>
+        <h2 data-i18n="online_title">Invite a friend</h2>
+        <p class="creator-hint" id="onlineStatus" data-i18n="online_connecting">Connecting…</p>
+        <p class="online-connected-title" id="onlineConnectedTitle" data-i18n="online_connected">In lobby now:</p>
+        <div class="online-list" id="onlineList"></div>
+        <p class="online-empty" id="onlineEmpty" data-i18n="online_empty">No one connected. Open the game on another device on the same Wi‑Fi.</p>
+        <div class="name-row">
+          <label class="name-label" for="onlineSearch" data-i18n="online_search">Friend's name or 3 digits</label>
+          <input class="name-input" id="onlineSearch" type="search" maxlength="15" placeholder="e.g. 123 or Eliya123" data-i18n-placeholder="online_search_ph" autocomplete="off" enterkeyhint="send" inputmode="text" />
+        </div>
+        <button class="btn online" id="onlineInviteBtn" type="button" data-i18n="send_invite">Send invite</button>
+        <p class="mode-blurb" data-i18n="online_blurb">If their name is listed above, they're online. They choose coop or versus.</p>
+        <button class="btn ghost" id="onlineBack" data-i18n="back">Back</button>
+      </div>
+    </section>
+
+    <div class="invite-toast hidden" id="inviteToast">
+      <div class="invite-card">
+        <p class="invite-title" id="inviteTitle" data-i18n="invite_title">Game invite!</p>
+        <p class="invite-body" id="inviteBody"></p>
+        <div class="invite-actions">
+          <button class="btn coop" id="inviteCoop" data-i18n="invite_coop">Play together 🤝</button>
+          <button class="btn versus" id="inviteVersus" data-i18n="invite_versus">Play versus ⚔️</button>
+          <button class="btn ghost" id="inviteDecline" data-i18n="invite_decline">Not now</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="screen hidden" id="twoPlayerScreen">
+      <div class="panel">
+        <p class="eyebrow" data-i18n="two_eyebrow">Two players</p>
+        <h2 data-i18n="two_title">How do we play together?</h2>
+        <p class="creator-hint" data-i18n="two_hint">Choose a mode for two players on one screen</p>
+        <div class="name-row dual">
+          <div>
+            <label class="name-label" for="nameInputP1b" data-i18n="p1_label">Blue player (3 digits)</label>
+            <input class="name-input" id="nameInputP1b" type="text" maxlength="15" placeholder="e.g. Blue111" data-i18n-placeholder="p1_ph" autocomplete="off" enterkeyhint="done" />
+          </div>
+          <div>
+            <label class="name-label" for="nameInputP2" data-i18n="p2_label">Orange player (3 digits)</label>
+            <input class="name-input" id="nameInputP2" type="text" maxlength="15" placeholder="e.g. Orange222" data-i18n-placeholder="p2_ph" autocomplete="off" enterkeyhint="done" />
+          </div>
+        </div>
+        <div class="menu-actions">
+          <button class="btn coop" id="coopBtn" data-i18n="coop">Co-op 🤝</button>
+          <p class="mode-blurb" data-i18n="coop_blurb">Both must reach the door. Revive a friend by touching them.</p>
+          <button class="btn versus" id="versusBtn" data-i18n="versus">Versus ⚔️</button>
+          <p class="mode-blurb" data-i18n="versus_blurb">7 duel stages · races & arenas · score until the champion</p>
+          <button class="btn ghost" id="twoPlayerBack" data-i18n="back">Back</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="leaderboardScreen">
+      <div class="panel leaderboard-panel">
+        <p class="eyebrow" data-i18n="lb_eyebrow">Coins</p>
+        <h2 data-i18n="lb_title">Leaderboard</h2>
+        <p class="creator-hint" id="leaderboardHint" data-i18n="lb_hint">Places 1–200 · +3 level · +10 boss · +2 replay</p>
+        <p class="leaderboard-me" id="leaderboardMe">Your coins: 0</p>
+        <div class="leaderboard-list" id="leaderboardList"></div>
+        <button class="btn ghost" id="leaderboardBack" data-i18n="back">Back</button>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="howtoScreen">
+      <div class="panel">
+        <h2 data-i18n="howto_title">How to play?</h2>
+        <ul class="howto-list">
+          <li data-i18n="howto_1">Name must include exactly 3 digits (e.g. Eliya123) to find friends online</li>
+          <li data-i18n="howto_2">Solo: joystick / WASD · books with Space or 📖</li>
+          <li data-i18n="howto_3">Two players: P1 = WASD + Space · P2 = arrows + Enter (or E)</li>
+          <li data-i18n="howto_4">Mobile: 📖 next to each stick, or tap half the screen (left=P1, right=P2)</li>
+          <li data-i18n="howto_5">In two-player mode books are available from level 1</li>
+          <li data-i18n="howto_6">Find the key 🔑 and escape through the door 🚪</li>
+          <li data-i18n="howto_7">From world 1 level 5: books 📖 lock onto zombies and freeze them 5s</li>
+          <li data-i18n="howto_8">Co-op: both must reach the door. If caught you freeze — friend revives you</li>
+          <li data-i18n="howto_9">Versus: 7 special stages. First to the door wins. Grab 🍌/🧴/🪑</li>
+          <li data-i18n="howto_10">Coins: +3 per level, +10 boss, +2 if you already cleared it — never lost on death</li>
+          <li data-i18n="howto_11">Continue: progress saves automatically</li>
+          <li data-i18n="howto_12">Worlds: 10 levels + boss. 3 lives — restart current world</li>
+        </ul>
+        <button class="btn primary" id="howtoBack" data-i18n="back">Back</button>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="creatorScreen">
+      <div class="panel">
+        <p class="eyebrow" data-i18n="creator_eyebrow">Creator ∞</p>
+        <h2 data-i18n="creator_title">Pick world & level</h2>
+        <p class="creator-hint" data-i18n="creator_hint">Infinite lives — choose a world then a level / boss</p>
+        <div class="world-tabs" id="worldTabs"></div>
+        <div class="level-grid" id="levelGrid"></div>
+        <button class="btn ghost" id="creatorBack" data-i18n="back">Back</button>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="storyScreen">
+      <div class="screen-bg story-bg" id="storyBg"></div>
+      <div class="panel story-panel">
+        <div class="story-art-wrap">
+          <img class="story-art" id="storyArt" alt="" />
+        </div>
+        <p class="eyebrow" id="storyStep">1 / 5</p>
+        <h2 id="storyTitle">A normal morning</h2>
+        <p class="story-text" id="storyText"></p>
+        <div class="story-dots" id="storyDots" aria-hidden="true"></div>
+        <button class="btn primary" id="storyNext" data-i18n="story_next">Continue</button>
+        <button class="btn ghost" id="storySkip" data-i18n="story_skip">Skip story</button>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="levelScreen">
+      <div class="panel center">
+        <p class="eyebrow" id="levelTitleLabel" data-i18n="level_label">Level</p>
+        <h2 id="levelTitle">1</h2>
+        <p id="levelDesc">...</p>
+        <button class="btn primary" id="levelGo" data-i18n="level_go">Go!</button>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="pauseScreen">
+      <div class="panel center">
+        <h2 data-i18n="pause">Paused</h2>
+        <button class="btn primary" id="resumeBtn" data-i18n="resume">Resume</button>
+        <button class="btn ghost hidden" id="pickLevelBtn" data-i18n="pick_level">Pick level</button>
+        <button class="btn ghost hidden" id="skipBtn" data-i18n="skip_level">Skip to next</button>
+        <button class="btn ghost" id="quitBtn" data-i18n="quit_menu">Back to menu</button>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="failScreen">
+      <div class="panel center">
+        <h2 id="failTitle" data-i18n="fail_title">Caught you!</h2>
+        <p id="failMsg" data-i18n="fail_msg">The zombies got you…</p>
+        <button class="btn primary" id="retryBtn" data-i18n="retry">Try again</button>
+        <button class="btn ghost" id="failMenuBtn" data-i18n="menu">Menu</button>
+      </div>
+    </section>
+
+    <section class="screen hidden" id="winScreen">
+      <div class="panel center">
+        <p class="eyebrow" id="winEyebrow" data-i18n="win_eyebrow">Victory!</p>
+        <h2 id="winTitle" data-i18n="win_title">You escaped school!</h2>
+        <p id="winMsg" data-i18n="win_msg">You beat the zombie principal!</p>
+        <button class="btn primary" id="againBtn" data-i18n="play_again">Play again</button>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/maps.js"></script>
+  <script src="js/sfx.js"></script>
+  <script src="js/online.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
